@@ -81,6 +81,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware", # PREP
     "django.middleware.common.CommonMiddleware",
+    "accounts.middleware.SocialLoginBaseRedirectMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -227,5 +228,17 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 CSRF_TRUSTED_ORIGINS = ["https://crook-unfrosted-proponent.ngrok-free.dev",]
+
+# ngrok принимает TLS и пересылает запросы в Django по HTTP с заголовком
+# X-Forwarded-Proto: https. Без этой настройки Django считает схему http,
+# и allauth отдаёт Google redirect_uri http://... вместо зарегистрированного
+# https://... (redirect_uri_mismatch).
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Единственный origin, зарегистрированный как Authorized redirect URI в
+# Google Cloud Console. На нём должна выполняться авторизация Google:
+# accounts.middleware.SocialLoginBaseRedirectMiddleware перенаправляет
+# сюда любой другой host при входе через Google.
+SOCIALACCOUNT_BASE_URL = "https://crook-unfrosted-proponent.ngrok-free.dev"
 
 # } Требуется для allauth
