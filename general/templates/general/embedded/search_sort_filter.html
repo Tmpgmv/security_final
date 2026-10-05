@@ -1,0 +1,79 @@
+{% load static %} 
+
+{% comment %} 
+
+Связка: 
+general/embedded/search_sort_filter.html
+general/scaffold/form._py - SearchSortFilterForm (сделать свою форму на основе этой)
+general/js/search-sort-filter.js
+
+general/base.html - возможно, потребуется раскомментировать загрузку 
+search-sort-filter.js.
+
+В заданиях может встретиться требование задать фильтрацию,
+сортировку или поиск.
+
+Осторожно: здесь кнопка очистки формы ведет на хомяк. При необходимости заменить.
+            
+В Django это стандартно делается через метод GET, потому что:
+    1. Фильтры и сортировка — это идентифицирующие запросы (они не изменяют данные на сервере).
+    2. С GET-параметрами работают закладки, история браузера, можно обновлять страницу без предупреждения.
+    3. ListView по умолчанию использует метод GET, и его легко адаптировать.                
+
+Если задание потребует автоматической отправки формы (без нажатия кнопки):
+1. Удалить кнопку "Отправить" из этого шаблона.
+2. В базовом шаблоне раскомментировать загрузку search-sort-filter.js.
+3. Проверить search-sort-filter.js - посмотреть, какие в форме отрендерились id,
+при необходимости прописать обработчики событий.
+
+Применение в шаблоне:
+{% include 'general/embedded/search_sort_filter.html' %}
+
+
+{% endcomment %}
+
+{% load bootstrap_icons %}
+
+{% if user.is_admin or user.is_manager %}
+<style>
+    .filter-form {
+        min-width: 300px;
+        max-width: 400px;
+    }
+
+    .filter-form select,
+    .filter-form input {
+        width: 100%;
+        padding: 5px 8px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .filter-form label {
+        display: block;
+        font-weight: normal;
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="d-flex">
+        <div class="filter-form">
+            <form id="search-sort-filter">                
+                {% for field in form %}
+                    <div>
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <button id="search-sort-filter-button" class="btn btn-primary" type="submit">{% bs_icon 'search' %}</button>
+            </form>            
+        </div>
+        <div class="ms-2">
+            <a id="search-sort-filter-cancel" href="{% url 'home' %}" class="text-danger">{% bs_icon 'x-circle' %}</a>
+        </div>
+    </div>
+</div>
+{% endif %}

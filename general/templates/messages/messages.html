@@ -1,0 +1,20 @@
+{% comment %} PREP { {% endcomment %}
+
+{% comment %}
+PREP
+
+Предположительно, студентам не потребуется. Используется в одном месте - shoes/accounts/templates/registration/login.html. 
+В цикле перебрать нетегированные ошибки.
+
+Применять в шаблоне:
+    {% include "messages/messages.html" with type="error" messages=form.non_field_errors %}
+
+{% endcomment %}
+
+{% load bootstrap_icons %}
+
+{% for message in messages %}
+    {% include "messages/message.html" with type="error" message=message %}
+{% endfor %}
+
+{% comment %} } PREP {% endcomment %}

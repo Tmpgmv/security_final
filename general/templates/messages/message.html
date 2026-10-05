@@ -1,0 +1,35 @@
+{% comment %} PREP { {% endcomment %}
+
+{% comment %}
+PREP
+
+Просто сообщение. Типов сообщения может быть два: ошибка или успех.
+
+Применять в шаблоне:
+    {% include "messages/message.html" with type="error" message="Описание ошибки" %}
+    {% include "messages/message.html" with message="Выполнено" %}
+
+{% endcomment %}
+
+{% load bootstrap_icons %}
+
+{% if message %}
+    <div id="message-container" class="message-box message-{{ type }} py-3 px-4 container mb-3">
+        <div id="message-d-flex" class="d-flex align-items-center">
+            <span id="message-icon-span">
+                {% if type == "error" %}
+                    {% bs_icon 'exclamation-octagon-fill' size='1.5em' color='#842029' %}
+                {% else %}
+                    {% bs_icon 'hand-thumbs-up-fill' size='1.5em' color='#0f5132' %}
+                {% endif %}
+            </span>
+
+            {# Applying the type class here ensures text color is also handled #}
+            <span id="message" class="ms-3 text-content-{{ type }}">
+                {{ message }}
+            </span>
+        </div>
+    </div>
+{% endif %}
+
+{% comment %} } PREP {% endcomment %}

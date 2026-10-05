@@ -1,0 +1,27 @@
+{% comment %} PREP { {% endcomment %}
+
+{% comment %}
+PREP
+
+Формы на Django могут автоматически через messages framework сигнализировать об ошибках.
+
+Технически это выглядит примерно так:
+messages.error(request, "Document deleted.")
+
+Также работает SuccessMessageMixin, которым мы активно пользуемся.
+
+Но для нас уровней сообщения только два: ошибка и успех (если не ошибка).
+
+Применять в шаблоне:
+    {% include "messages/tagged_messages.html" %}
+
+{% endcomment %}
+
+{% load bootstrap_icons %}
+
+{% for message in messages %}
+    {% include "messages/message.html" with type=message.tags message=message %}
+{% endfor %}
+
+
+{% comment %} } PREP {% endcomment %}

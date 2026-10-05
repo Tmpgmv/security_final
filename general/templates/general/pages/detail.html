@@ -1,0 +1,60 @@
+{% extends 'general/base.html' %}
+
+{% comment %}
+
+Отобразить все поля объекта.
+
+В представление DetailView добавьте:
+
+template_name = "general/pages/detail.html"
+
+Представление обязательно должно наследовать от GetVerboseNameMixin.
+
+{% endcomment %}
+
+
+{% load static %}
+{% load model_filters %}
+{% load bootstrap_icons %}
+
+
+{% block title %}
+    {{ view.get_verbose_name }}: {{ object }}
+{% endblock %}
+
+{% block h %}
+    {{ view.get_verbose_name }}: {{ object }}
+{% endblock %}
+
+
+{% block content %}
+{% if user.is_admin %}
+<div class="container mb-3">
+    <a id="update-link" href="{{ object.get_update_url }}" class="btn attention mt-2 mb-2">{% bs_icon 'pencil-fill' %}</a>
+    <a id="delete-link" href="{{ object.get_delete_url }}" class="btn attention del-button mt-2 mb-2">{% bs_icon 'trash' %}</a>
+</div>
+{% endif %}
+
+<div id="detail-container" class="container">
+
+    <div id="detail-row" class="row g-3">
+        {% for field in object|get_fields %}
+        <div id="detail-col-{{ forloop.counter }}" class="col-12">
+            <div id="card-{{ forloop.counter }}" class="card h-100">
+                <div id="card-header-{{ forloop.counter }}" class="card-header bg-light">
+                    <strong id="field-label-{{ forloop.counter }}">{{ field.label }}</strong>
+                </div>
+                <div id="card-body-{{ forloop.counter }}" class="card-body">
+                    {% if field.is_image and field.value %}
+                        <img id="img-{{ forloop.counter }}" src="{{ field.value.url }}" class="img-fluid rounded"
+                             alt="{{ field.label }}">
+                    {% else %}
+                        {{ field.value|default:"—"|linebreaks }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

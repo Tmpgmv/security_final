@@ -1,0 +1,39 @@
+{% extends "general/base.html" %}
+
+{% block content %}
+
+    {% include "messages/messages.html" with type="error" messages=form.non_field_errors %}
+
+    <div id="login-form-container" class="container mt-5 d-flex justify-content-center align-items-center">
+        <div id="w-100-wrapper" class="w-100" style="max-width: 400px;">  <!-- Wrapper for both forms -->
+            <form id="login-form" method="post" action="/accounts/login/">
+                {% csrf_token %}
+                <table id="login-table" class="table table-borderless mb-3 w-100">
+                    <tbody>
+                        <tr id="username-tr">
+                            <td id="username-label-td"><label for="username" class="form-label">Имя пользователя:</label></td>
+                            <td id="username-input-td"><input id="username-input" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="username" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td id="password-label-td"><label id="password-label" for="password" class="form-label">Пароль:</label></td>
+                            <td id="password-input-td"><input id="password-input" type="password" name="password" autocomplete="current-password" required="" id="password" class="form-control"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button id="login-button" type="submit" class="btn attention w-100 mb-2">Войти</button>
+            </form>
+
+            <form id="guest-login-form" class="my-3" action="/accounts/login/" method="post">
+                {% csrf_token %}
+                <input id="guest-username-input" type="hidden" name="username" value="g">
+                <input id="guest-password-input" type="hidden" name="password" value="g">
+                <button id="guest-login-button" type="submit" class="btn attention-border w-100">Гость</button>
+            </form>
+            <a href="{% url 'google_login' %}">Войти через Google</a>
+        </div>
+
+    </div>
+
+
+
+{% endblock %}

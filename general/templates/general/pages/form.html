@@ -1,0 +1,79 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% comment %}
+PREP
+
+В представление CreateView или UpdateView добавьте:
+
+template_name = "general/pages/form.html"
+
+Представление обязательно должно наследовать от GetVerboseNameMixin.
+
+{% endcomment %}
+
+{% load bootstrap_icons %}
+
+{% block h %}
+    {% if object %}
+        Редактировать {{ view.get_verbose_name|lower }}: {{ object }}
+    {% else %}
+        Добавить {{ view.get_verbose_name|lower }}
+    {% endif %}
+{% endblock %}
+
+{% block title %}
+    {% if object %}
+        Редактировать {{ view.get_verbose_name }}: {{ object }}
+    {% else %}
+        Добавить {{ view.get_verbose_name }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<html>
+    <head>
+        <link href="{% static 'general/css/bootstrap.min.css'%}" rel="stylesheet">
+    </head>
+
+<form id="form-with-confirmation" enctype="multipart/form-data" action="{{ action }}" method="POST">
+    {% csrf_token %}
+    <table>
+    {{form.as_table}}
+    </table>
+    <button id="confirm-button" type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#confirmModal">
+        Сохранить
+    </button>
+</form>
+
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div id="modal-dialog-div" class="modal-dialog">
+        <div id="modal-content-div" class="modal-content">
+            <div id="modal-header" class="modal-header">
+                <h5 id="modal-title" class="modal-title" id="confirmModalLabel">Подтверждение сохранения</h5>
+                <button id="close-button" type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="confirm-img" src="{% static 'general/img/confirmation.svg' %}" alt="Confirm" class="img-fluid mb-3" style="max-width: 80px;">
+                <p>Сохранить</p>
+            </div>
+            <div id="modal-footer" class="modal-footer">
+                <button id="cancel-button" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <button id="confirm-button" type="button" class="btn btn-danger" id="confirm-btn">Да</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.getElementById('confirm-btn').addEventListener('click', function() {
+    document.getElementById('form-with-confirmation').submit();
+});
+</script>
+
+</html>
+
+{% endblock %}

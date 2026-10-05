@@ -1,0 +1,46 @@
+{% load static %}
+{% load bootstrap_icons %}
+
+{% comment %}
+
+PREP
+
+https://getbootstrap.com/docs/5.3/utilities/spacing/#gap
+
+Элемент <a> с классом stretched-link добавляет псевдо-элемент,
+который имеет ширину и высоту.
+
+Будучи помещен выше внутренних дивов, он сдвигает элементы и
+рушит всю гармонию.
+
+Если поместить ссылку после внутренних дивов,
+визуально удваивается марджин снизу.
+
+Поэтому у внутренних дивов снизу нет марджинов.
+
+Ипользование:
+
+{% include 'objects/one_column.html' %}
+
+{% endcomment %}
+
+
+
+<div style="grid-template-columns: 1fr;" class="d-grid mb-3 mt-3 {% if not user.is_admin %}pb-3{% endif %} position-relative attention-border">
+
+    <div class="p-2 ms-3 mt-3 me-3 mb-3 attention-border position-relative">
+        <p class="fw-bold">Grid item 2</p>
+        <p>Grid item 2</p>
+        <p>Grid item 2</p>
+        <p>Grid item 2</p>
+
+        {% comment %}
+        {% if user.is_admin %}
+            <a class="btn del-button position-absolute z-3" href="{# PREP {{ item.get_delete_url }} #}">{% bs_icon 'trash' %}</a>
+        {% endif %}
+        {% endcomment %}
+    </div>
+    {% if user.is_admin %}
+        <a href="{# PREP {{ item.get_update_url }} #}" class="stretched-link"></a>
+    {% endif %}
+</div>

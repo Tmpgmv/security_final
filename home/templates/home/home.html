@@ -1,0 +1,15 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% load bootstrap_icons %}
+
+{% block title %}
+Главная страница
+{% endblock %}
+
+{% block h %}
+Главная страница
+{% endblock %}
+
+{% block content %}
+<a id="create-button" href="{% url 'products' %}" class="btn attention mt-2 mb-2">Товары</a>
+{% endblock %}

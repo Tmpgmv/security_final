@@ -1,0 +1,43 @@
+{% extends 'general/base.html' %}
+
+{% comment %}
+PREP
+
+В представление DeleteView добавьте:
+
+template_name = "general/pages/confirm_delete.html"
+
+Представление обязательно должно наследовать от GetVerboseNameMixin.
+
+{%endcomment%}
+
+{% load bootstrap_icons %}
+
+{% block h %}
+    Удалить {{ view.get_verbose_name|lower }}: {{ object }}
+{% endblock %}
+
+{% block title %}
+    Удалить {{ view.get_verbose_name|lower }}: {{ object }}
+{% endblock %}
+
+{% block content %}
+
+
+<div id="form-container" class=container>
+    <div id="form-row" class="row">
+        <div id="trash-icon-div" class="col-12 col-md-1">
+            {% bs_icon 'trash3-fill' color='#dc3545' size='2em' %}
+        </div>
+        <div id="form-div" class="col-12 col-md-11">
+            <form id="confirmation-form" method="post">
+                {% csrf_token %}
+                <p>Удалить {{ view.get_verbose_name }}: {{ object }}"?</p>
+                {{ form }}
+                <input id="confirmation-button" class="btn btn-primary" type="submit" value="Да">
+                <input id="cancel-button" class="btn btn-danger" type=button value="Нет" onClick="javascript:history.go(-1);">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

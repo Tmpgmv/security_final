@@ -1,0 +1,26 @@
+# PREP {
+cookiecutter==2.7.1
+Django==5.2
+django-plaintext-password==0.3.0 # https://pypi.org/project/django-plaintext-password/
+pillow==12.0.0
+django-resized==1.0.3 # https://pypi.org/project/django-resized/
+django-cleanup==9.0.0 # https://pypi.org/project/django-cleanup/
+django-bootstrap-icons==0.9.0 # https://pypi.org/project/django-bootstrap-icons/
+django-jquery==3.1.0 # https://pypi.org/project/django-jquery/
+psycopg2-binary==2.9.11
+django-concurrency==2.7 # https://django-concurrency.readthedocs.io/en/latest/
+selenium==4.40.0
+pywebview==6.2.1 # https://pywebview.flowrl.com/
+django-admin-react==1.13.1 # https://pypi.org/project/django-admin-react/
+django-admin-rest-api==1.8.1 # https://pypi.org/project/django-admin-rest-api/
+django-model-info==2026.3.1 # https://django-model-info.readthedocs.io/en/latest/
+django-allauth==65.19.7
+PyJWT==2.15.1
+
+# DRF { https://www.django-rest-framework.org/
+djangorestframework==3.17.1
+Markdown==3.10.2
+django-filter==25.2
+# } DRF
+
+# } PREP

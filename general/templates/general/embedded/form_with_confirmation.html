@@ -1,0 +1,61 @@
+{% load static %}
+
+{% comment %}
+PREP
+
+Применение в шаблоне:
+{% include 'general/embedded/form_with_confirmation.html' %}
+{% include 'general/embedded/form_with_confirmation.html' with button_text="Добавить в заказ" %}
+
+{% url 'order-product-create' as action_url %}
+{% include 'general/embedded/form_with_confirmation.html' with action=action_url %}
+{% include 'general/embedded/form_with_confirmation.html' with action=action_url button_text="Добавить в заказ" %}
+
+{% endcomment %}
+
+
+
+<html>
+    <head>
+        <link href="{% static 'general/css/bootstrap.min.css'%}" rel="stylesheet">
+    </head>
+
+<form id="form-with-confirmation" enctype="multipart/form-data" action="{{ action }}" method="POST">
+    {% csrf_token %}
+    <table>
+    {{form.as_table}}
+    </table>
+    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#confirmModal">
+        {{ button_text|default:"Сохранить" }}
+    </button>
+</form>
+
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Подтверждение сохранения</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{% static 'general/img/confirmation.svg' %}" alt="Confirm" class="img-fluid mb-3" style="max-width: 80px;">
+                <p>{{ button_text|default:"Сохранить" }}?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <button type="button" class="btn btn-danger" id="confirm-btn">Да</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'general/js/bootstrap.bundle.min.js' %}"></script>
+<script>
+document.getElementById('confirm-btn').addEventListener('click', function() {
+    document.getElementById('form-with-confirmation').submit();
+});
+</script>
+
+</html>
