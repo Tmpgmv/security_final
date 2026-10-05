@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-wq_x*w%6zxwi@ux#(gmfq*ije&jy-g*p7(0z@)fy2yef9@b1c%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'crook-unfrosted-proponent.ngrok-free.dev', '0.0.0.0']
 
 # Application definition
 
@@ -225,5 +225,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+CSRF_TRUSTED_ORIGINS = ["https://crook-unfrosted-proponent.ngrok-free.dev",]
 
 # } Требуется для allauth
