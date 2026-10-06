@@ -241,4 +241,9 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # сюда любой другой host при входе через Google.
 SOCIALACCOUNT_BASE_URL = "https://crook-unfrosted-proponent.ngrok-free.dev"
 
+# Сколько секунд живёт одноразовый токен, которым ngrok-оригин после
+# OAuth-колбэка передаёт вход обратно на исходный адрес
+# (localhost — в разработке, 10.8.0.1 — на VM). См. accounts/handoff.py.
+SOCIALACCOUNT_HANDOFF_MAX_AGE = 300
+
 # } Требуется для allauth

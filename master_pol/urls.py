@@ -26,6 +26,8 @@ from general.views import HtmlGeneratorView, JsonGeneratorView
 from home.views import HomeView
 from rest_framework import routers
 
+from accounts.views import handoff
+
 from product_list.views import ProductListView
 
 """
@@ -49,6 +51,9 @@ from product_list.views import ProductListView
 router = routers.DefaultRouter()
 
 urlpatterns = [
+    # Одноразовый переход после OAuth-входа через ngrok обратно на
+    # исходный адрес (localhost / 10.8.0.1) — см. accounts.middleware.
+    path("accounts/handoff/", handoff, name="accounts_handoff"),
     path("accounts/", include("django.contrib.auth.urls")),
     path('accounts/', include('allauth.urls')),
     path("admin/", admin.site.urls),
