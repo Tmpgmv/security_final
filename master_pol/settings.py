@@ -235,11 +235,23 @@ CSRF_TRUSTED_ORIGINS = ["https://crook-unfrosted-proponent.ngrok-free.dev",]
 # https://... (redirect_uri_mismatch).
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# Единственный origin, зарегистрированный как Authorized redirect URI в
-# Google Cloud Console. На нём должна выполняться авторизация Google:
+# Публичный origin, зарегистрированный в Google Cloud Console как
+# Authorized redirect URI. На нём выполняется авторизация Google для
+# хостов БЕЗ собственного зарегистрированного redirect URI (например,
+# 10.8.0.1 — Google запрещает IP-адреса в redirect URI):
 # accounts.middleware.SocialLoginBaseRedirectMiddleware перенаправляет
-# сюда любой другой host при входе через Google.
+# сюда их вход через Google, а после колбэка возвращает пользователя
+# обратно (см. SOCIALACCOUNT_HANDOFF_MAX_AGE и accounts/handoff.py).
 SOCIALACCOUNT_BASE_URL = "https://crook-unfrosted-proponent.ngrok-free.dev"
+
+# Хосты (точно, с портом — так же, как в адресной строке), у которых
+# собственный redirect URI зарегистрирован в Google Cloud Console:
+#     http://localhost:8000/accounts/google/login/callback/
+# С них вход через Google идёт напрямую, без ngrok: в адресной строке
+# всё время остаётся localhost:8000. Каждая запись обязана точно
+# совпадать с origin зарегистрированного URI, иначе Google ответит
+# redirect_uri_mismatch.
+SOCIALACCOUNT_DIRECT_LOGIN_HOSTS = ["localhost:8000"]
 
 # Сколько секунд живёт одноразовый токен, которым ngrok-оригин после
 # OAuth-колбэка передаёт вход обратно на исходный адрес

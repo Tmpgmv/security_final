@@ -4,9 +4,12 @@ Two hard constraints shape this middleware:
 
 1. Google only accepts redirect URIs on a public top-level domain — raw IPs
    such as ``10.8.0.1`` are rejected by the Cloud Console (only ``localhost``
-   and ``127.0.0.1`` are exempt).  The OAuth callback therefore must land on
-   the single registered origin, ``settings.SOCIALACCOUNT_BASE_URL`` (the
-   ngrok tunnel).  Login start and callback must also share one origin,
+   and ``127.0.0.1`` are exempt).  A host whose *own* callback is registered
+   in the Cloud Console (``settings.SOCIALACCOUNT_DIRECT_LOGIN_HOSTS``,
+   e.g. ``localhost:8000``) therefore runs the whole flow on its own address
+   and never shows another origin.  Any other host must run the flow on
+   ``settings.SOCIALACCOUNT_BASE_URL`` (the ngrok tunnel, whose callback is
+   registered).  Login start and callback must also share one origin,
    because django-allauth stashes its OAuth state in the session of whichever
    origin started the flow.
 2. A session cookie is scoped to its origin: a session created on the ngrok
@@ -17,8 +20,11 @@ So after a successful callback the browser is handed *back* to the address it
 actually browses, via ``/accounts/handoff/`` and a signed, short-lived,
 single-use token (see ``accounts/handoff.py``).  Concretely, for a request:
 
-* ``/accounts/google/login/`` on a host other than the registered origin —
-  302 to the registered origin, carrying the original origin along as
+* ``/accounts/google/login/`` on a host listed in
+  ``SOCIALACCOUNT_DIRECT_LOGIN_HOSTS`` — untouched, the flow stays on the
+  user's own address;
+* ``/accounts/google/login/`` on any other non-registered host — 302 to the
+  registered origin, carrying the original origin along as
   ``?origin=<scheme>://<host>``;
 * ``/accounts/google/login/`` *on* the registered origin — once the view
   302's the browser to Google, remember the ``origin`` parameter in an
@@ -79,8 +85,16 @@ class SocialLoginBaseRedirectMiddleware:
 
         base_host = (urlsplit(base_url).hostname or "").lower()
         request_host = (urlsplit("//" + request.get_host()).hostname or "").lower()
+        direct_hosts = {
+            host.lower()
+            for host in getattr(settings, "SOCIALACCOUNT_DIRECT_LOGIN_HOSTS", []) or []
+        }
 
-        if request.path == GOOGLE_LOGIN_PATH and request_host != base_host:
+        if (
+            request.path == GOOGLE_LOGIN_PATH
+            and request.get_host().lower() not in direct_hosts
+            and request_host != base_host
+        ):
             # (1) Start the flow on the registered origin, telling it where
             # the user came from.
             origin = _request_origin(request)
