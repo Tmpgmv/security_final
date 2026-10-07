@@ -81,6 +81,9 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware", # PREP
     "django.middleware.common.CommonMiddleware",
+    # Публичный туннель (ngrok) отдаёт только OAuth-колбэк Google:
+    # всё остальное (/ , /products/ , /admin/) закрыто — см. accounts.middleware.
+    "accounts.middleware.PublicRelayGuardMiddleware",
     "accounts.middleware.SocialLoginBaseRedirectMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",

@@ -1,0 +1,81 @@
+diff --git a/accounts/middleware.py b/accounts/middleware.py
+index d4a3dab..45e46b1 100644
+--- a/accounts/middleware.py
++++ b/accounts/middleware.py
+@@ -36,12 +36,16 @@ single-use token (see ``accounts/handoff.py``).  Concretely, for a request:
+   ``<origin>/accounts/handoff/?t=<token>&next=<path>``.
+ 
+ Anything else passes through untouched.
++
++Because Google forces the callback onto a public domain, the tunnel would
++otherwise expose the whole site, so ``PublicRelayGuardMiddleware`` serves
++*only* the two OAuth paths on that origin and refuses everything else.
+ """
+ 
+ from urllib.parse import urlencode, urlsplit
+ 
+ from django.conf import settings
+-from django.http import HttpResponseRedirect
++from django.http import HttpResponseForbidden, HttpResponseRedirect
+ from django.http.request import validate_host
+ from django.urls import reverse
+ 
+@@ -71,6 +75,44 @@ def _allowed_origin(origin: str) -> bool:
+     return validate_host(parts.hostname, settings.ALLOWED_HOSTS)
+ 
+ 
++class PublicRelayGuardMiddleware:
++    """Shut the public relay down for everything but the OAuth dance.
++
++    The ngrok tunnel exists for exactly one reason: Google refuses raw IPs
++    as redirect URIs, so the *callback* has to arrive on a registered public
++    domain.  Every other path on that origin — ``/``, ``/products/``,
++    ``/admin/``, account pages, static files — is refused here, so the
++    application itself is only ever reachable from the addresses it is
++    really served on (``localhost`` in development, ``10.8.0.1`` from the
++    client machine over the VPN).
++    """
++
++    PUBLIC_RELAY_PATHS = frozenset(
++        {GOOGLE_LOGIN_PATH.rstrip("/"), GOOGLE_CALLBACK_PATH.rstrip("/")}
++    )
++
++    def __init__(self, get_response):
++        self.get_response = get_response
++
++    def __call__(self, request):
++        base_url = (getattr(settings, "SOCIALACCOUNT_BASE_URL", "") or "").rstrip("/")
++        if base_url:
++            base_host = (urlsplit(base_url).hostname or "").lower()
++            request_host = (urlsplit("//" + request.get_host()).hostname or "").lower()
++            if (
++                request_host == base_host
++                and request.path.rstrip("/") not in self.PUBLIC_RELAY_PATHS
++            ):
++                return HttpResponseForbidden(
++                    "Доступ через публичный туннель закрыт.\n"
++                    "Этот адрес обслуживает только OAuth-редирект Google; "
++                    "само приложение откройте по его внутреннему адресу "
++                    "(например, http://10.8.0.1).",
++                    content_type="text/plain; charset=utf-8",
++                )
++        return self.get_response(request)
++
++
+ class SocialLoginBaseRedirectMiddleware:
+     """Keep the OAuth flow on ``settings.SOCIALACCOUNT_BASE_URL`` and, once
+     the user is signed in, hand the browser back to the original origin."""
+diff --git a/master_pol/settings.py b/master_pol/settings.py
+index 86481a0..09821a1 100644
+--- a/master_pol/settings.py
++++ b/master_pol/settings.py
+@@ -81,6 +81,9 @@ MIDDLEWARE = [
+     "django.contrib.sessions.middleware.SessionMiddleware",
+     "django.middleware.locale.LocaleMiddleware", # PREP
+     "django.middleware.common.CommonMiddleware",
++    # Публичный туннель (ngrok) отдаёт только OAuth-колбэк Google:
++    # всё остальное (/ , /products/ , /admin/) закрыто — см. accounts.middleware.
++    "accounts.middleware.PublicRelayGuardMiddleware",
+     "accounts.middleware.SocialLoginBaseRedirectMiddleware",
+     'django.middleware.csrf.CsrfViewMiddleware',
+     "django.contrib.auth.middleware.AuthenticationMiddleware",
